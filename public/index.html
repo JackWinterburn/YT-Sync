@@ -11,15 +11,10 @@
 
     <div id="player"></div>
 
-    <button class="play">Play</button>
-    <button class="pause">Pause</button>
+    <!-- <button class="play">Play</button>
+    <button class="pause">Pause</button> -->
 
     <script>
-        let plbtn = document.querySelector(".play");
-        let pabtn = document.querySelector(".pause");
-
-        plbtn.addEventListener("click", () => startVideo())
-        pabtn.addEventListener("click", () => stopVideo())
 
         // 2. This code loads the IFrame Player API code asynchronously.
         var tag = document.createElement('script');
@@ -37,7 +32,11 @@
             width: '640',
             videoId: 'M7lc1UVf-VE',
             playerVars: {
-                'playsinline': 1
+                'playsinline': 1,
+                'controls': 0,
+                'disablekb': 1,
+                'rel': 0,
+                'showinfo': 0
             },
             events: {
                 'onReady': onPlayerReady,
@@ -67,6 +66,27 @@
         function startVideo() {
             player.playVideo();
         }
+
+        // Websocket stuff
+        let socket = new WebSocket("ws://localhost:8080/ws/1");
+        console.log("Attempting Connection...");
+
+        socket.onopen = () => {
+            console.log("Successfully Connected");
+            socket.send("New Connection.")
+
+        };
+        
+        socket.onclose = event => {
+            console.log("Socket Closed Connection: ", event);
+            socket.send("A connection has closed.")
+        };
+
+        socket.onerror = error => {
+            console.log("Socket Error: ", error);
+        };
+
+        
     </script>
 </body>
 </html>
