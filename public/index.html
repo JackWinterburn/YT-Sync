@@ -11,10 +11,14 @@
 
     <div id="player"></div>
 
-    <!-- <button class="play">Play</button>
-    <button class="pause">Pause</button> -->
+    <button class="play">Play</button>
+    <button class="pause">Pause</button>
 
     <script>
+        window.onload = () => alert("Please click confirm to get started.")
+
+        let playBtn = document.querySelector(".play");
+        let pauseBtn = document.querySelector(".pause");
 
         // 2. This code loads the IFrame Player API code asynchronously.
         var tag = document.createElement('script');
@@ -33,7 +37,7 @@
             videoId: 'M7lc1UVf-VE',
             playerVars: {
                 'playsinline': 1,
-                'controls': 0,
+                // 'controls': 0,
                 'disablekb': 1,
                 'rel': 0,
                 'showinfo': 0
@@ -68,18 +72,34 @@
         }
 
         // Websocket stuff
-        let socket = new WebSocket("ws://localhost:8080/ws/1");
+        let socket = new WebSocket("ws://localhost:8080/ws");
         console.log("Attempting Connection...");
 
         socket.onopen = () => {
             console.log("Successfully Connected");
-            socket.send("New Connection.")
+            socket.send("New Connection.");
 
+            playBtn.addEventListener("click", () => socket.send("Play"))
+            pauseBtn.addEventListener("click", () => socket.send("Pause"))
         };
+
+        socket.onmessage = (msg) => {
+            msg = JSON.parse(msg.data).body
+            console.log(`New websocket message: ${msg}`);
+
+            switch(msg) {
+                case "Play":
+                    startVideo();
+                    break;
+                case "Pause":
+                    stopVideo();
+                    break;
+            }
+        }
         
         socket.onclose = event => {
             console.log("Socket Closed Connection: ", event);
-            socket.send("A connection has closed.")
+            socket.send("A connection has closed.");
         };
 
         socket.onerror = error => {
